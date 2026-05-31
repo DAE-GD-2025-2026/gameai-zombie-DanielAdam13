@@ -14,13 +14,11 @@ UFindWanderLocationDanielAdamov::UFindWanderLocationDanielAdamov()
 
 EBTNodeResult::Type UFindWanderLocationDanielAdamov::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	// Task needs a valid AIControlelr and Pawn
+	// Task requires a valid AIController and Pawn as well as a valid Nav System
 	const AAIController* Controller{ OwnerComp.GetAIOwner() };
 	const APawn* Pawn{ Controller ? Controller->GetPawn() : nullptr };
 	if (!Pawn)
 		return EBTNodeResult::Failed;
-	
-	// Task needs a valid Nav System
 	UNavigationSystemV1* NavSys{ FNavigationSystem::GetCurrent<UNavigationSystemV1>( Pawn->GetWorld() ) };
 	if (!NavSys)
 		return EBTNodeResult::Failed;

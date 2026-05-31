@@ -39,7 +39,8 @@ public class AdamovDanielZombieRuntime : ModuleRules
 				"Slate",
 				"SlateCore",
 				"AIModule", // added
-				"NavigationSystem" // added
+				"NavigationSystem", // added
+				"GameAI_Zombie"
 			}
 			);
 		
