@@ -38,8 +38,8 @@ public class AdamovDanielZombieRuntime : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"AIModule" // added
-				// ... add private dependencies that you statically link with here ...	
+				"AIModule", // added
+				"NavigationSystem" // added
 			}
 			);
 		
