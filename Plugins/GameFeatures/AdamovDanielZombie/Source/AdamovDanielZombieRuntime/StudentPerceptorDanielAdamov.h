@@ -70,11 +70,13 @@ private:
 	void HandleDamage(AActor* Actor, const FAIStimulus& Stimulus);
 	
 	void RefreshWorldMemory(); // Clears stagnant memory and updates house perception
-	void WriteBlackboard();
+	void WriteBlackboard() const;
 	
 	// ----- Hardest Logic of the class -----
 	AActor* SelectThreat() const; // Called in WriteBlackboard()
 	AActor* SelectTargetItem() const; // Called in WriteBlackboard()
+	int32 GetItemPriority(EItemType ItemType, int32 Value) const; // Helper for Item
+	bool HasUsableWeapon() const noexcept; // Helper for Item
 	AActor* SelectHouseTarget() const; // Called in WriteBlackboard()
 	
 	// Templated function so we can use it for a Zombie, Item and House
@@ -85,8 +87,8 @@ private:
 	
 	// BB getters:
 	UBlackboardComponent* GetBlackboard() const;
-	float GetHealthPct() const noexcept;
-	float GetStaminaPct() const noexcept;
+	float GetHealthPct() const noexcept; // Used for Item Priority
+	float GetStaminaPct() const noexcept;  // Used for Item Priority
 };
 
 template <typename TRecord>

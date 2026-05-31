@@ -2,6 +2,7 @@
 
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Common/InventoryComponent.h"
 #include "Items/BaseItem.h"
 #include "Village/House/House.h"
 #include "Zombies/BaseZombie.h"
@@ -157,7 +158,7 @@ void UStudentPerceptorDanielAdamov::RefreshWorldMemory()
 {
 	const float TimeNow{ static_cast<float>(GetWorld()->GetTimeSeconds()) };
 	
-	// 1. Remove stagnant memory
+	// 1. Remove stagnant memory (zombies are forgotten)
 	Items.RemoveAll( [](const FPerceivedItem& R)
 	{
 		return !R.Actor.IsValid() || R.Actor->IsHidden();
@@ -190,30 +191,157 @@ void UStudentPerceptorDanielAdamov::RefreshWorldMemory()
 
 AActor* UStudentPerceptorDanielAdamov::SelectThreat() const
 {
+	const FVector MyLocation{ GetOwner()->GetActorLocation() };
+	const float TimeNow{ static_cast<float>(GetWorld()->GetTimeSeconds()) };
 	
+	// Calculate the NEAREST ZOMBIE which is currently visible and is still in memory
+	AActor* BestZombie{ nullptr };
+	float BestDistSqr{ TNumericLimits<float>::Max() };
+	for (const FPerceivedActor& Z : Zombies)
+	{
+		if (!Z.Actor.IsValid())
+			continue;
+		// Skip if Zombie is not currently visible and exceeded memory duration
+		if (!Z.bIsVisible && (TimeNow - Z.LastSeenTime) > ThreatMemoryDuration)
+			continue;
+		
+		const float DistSqr{ static_cast<float>(FVector::DistSquared( MyLocation, Z.LastKnownLocation )) };
+		if (DistSqr < BestDistSqr)
+		{
+			BestDistSqr = DistSqr;
+			BestZombie = Z.Actor.Get();
+		}
+	}
+	
+	return BestZombie;
 }
 
 AActor* UStudentPerceptorDanielAdamov::SelectTargetItem() const
 {
+	const FVector MyLocation{ GetOwner()->GetActorLocation() };
+	
+	// Most interesting/complicated decision-making logic:
+	// Best Item depends on situation
+	AActor* BestItem{ nullptr };
+	int32 BestPriority{ 0 }; // 0 means not worth
+	float BestDistSqr{ TNumericLimits<float>::Max() }; 	// Priority comes first, Distance is secondary 
+	
+	for (const FPerceivedItem& PerItem : Items)
+	{
+		if (!PerItem.Actor.IsValid() || PerItem.Actor->IsHidden())
+			continue;
+		const ABaseItem* Item{ Cast<ABaseItem>( PerItem.Actor.Get() ) };
+		if (!Item)
+			continue;
+		
+		// Skip if not worth at all
+		const int32 Priority{ GetItemPriority( PerItem.Type, Item->GetValue() ) };
+		if (Priority <= 0)
+			continue;
+		
+		// Priority comes first, Distance is secondary 
+		const float DistSqr{ static_cast<float>(FVector::DistSquared( MyLocation, PerItem.LastKnownLocation )) };
+		if (Priority > BestPriority || (Priority == BestPriority && DistSqr < BestDistSqr))
+		{
+			BestPriority = Priority;
+			BestDistSqr = DistSqr;
+			BestItem = PerItem.Actor.Get();
+		}
+	}
+	
+	return BestItem;
+}
+
+int32 UStudentPerceptorDanielAdamov::GetItemPriority(EItemType ItemType, int32 Value) const
+{
+	if (Value <= 0)
+		return 0;
+	
+	const bool bHasWeapon{ HasUsableWeapon() };
+	const float Health{ GetHealthPct() };
+	const float Stamina{ GetStaminaPct() };
+
+	// Weapon is the biggest priority if survivor doesn't have one.
+	// Medkit is second-biggest priority if health is low
+	// Food is third-biggest priority if stamina is low
+	switch (ItemType)
+	{
+	case EItemType::Pistol:
+		return bHasWeapon ? 30 : 101;
+	case EItemType::Shotgun:
+		return bHasWeapon ? 30 : 100;
+	case EItemType::Medkit:
+		return Health < 0.5f ? 90 : 40;
+	case EItemType::Food:
+		return Stamina < 0.4f ? 80 : 20;
+	default:
+		return 0; // Garbage or unknown
+	}
+}
+
+bool UStudentPerceptorDanielAdamov::HasUsableWeapon() const noexcept
+{
+	// Returns true if Inventory has a Pistol or Shotgun with >0 ammo
+	
+	const UInventoryComponent* Inv{ GetOwner()->FindComponentByClass<UInventoryComponent>() };
+	if (!Inv)
+		return false;
+	
+	for (const ABaseItem* Item : Inv->GetInventory())
+	{
+		if (!Item)
+			continue;
+		
+		const EItemType T{ Item-> GetItemType() };
+		if ((T == EItemType::Pistol || T == EItemType::Shotgun) && Item->GetValue() > 0 )
+			return true;
+	}
+	
+	return false;
 }
 
 AActor* UStudentPerceptorDanielAdamov::SelectHouseTarget() const
 {
+	const FVector MyLocation{ GetOwner()->GetActorLocation() };
+	
+	// Choose the Nearest House which is not already visited
+	AActor* BestHouse{ nullptr };
+	float BestDistSqr{ TNumericLimits<float>::Max() };
+	for (const FPerceivedHouse& H : Houses)
+	{
+		// Skip already visited houses
+		if (!H.Actor.IsValid() || H.bVisited)
+			continue;
+		
+		const float DistSqr{ static_cast<float>(FVector::DistSquared( MyLocation, H.LastKnownLocation )) };
+		if (DistSqr < BestDistSqr)
+		{
+			BestDistSqr = DistSqr;
+			BestHouse = H.Actor.Get();
+		}
+	}
+	
+	return BestHouse;
 }
 
-void UStudentPerceptorDanielAdamov::WriteBlackboard()
+void UStudentPerceptorDanielAdamov::WriteBlackboard() const
 {
+	// This is being called every frame and on every Refresh World Memory...
+	// It is needed I think because targets are constantly updated...
+	
 	UBlackboardComponent* BB{ GetBlackboard() };
 	if (!BB)
 		return;
 	
-	//BB->SetValueAsObject( SurvivorBBKeys::ThreatActor )
+	BB->SetValueAsObject( SurvivorBBKeys::ThreatActor, SelectThreat() );
+	BB->SetValueAsObject( SurvivorBBKeys::TargetItem, SelectTargetItem() );
+	BB->SetValueAsObject( SurvivorBBKeys::KnownHouseTarget, SelectHouseTarget() );
 }
 
 UBlackboardComponent* UStudentPerceptorDanielAdamov::GetBlackboard() const
 {
 	const APawn* Pawn{ Cast<APawn>( GetOwner() ) };
-	const AAIController* AI{ Pawn ? Cast<AAIController>( Pawn->GetController() ) : nullptr };
+	AAIController* AI{ Pawn ? Cast<AAIController>( Pawn->GetController() ) : nullptr };
 	
 	return AI ? AI->GetBlackboardComponent() : nullptr;
 }
