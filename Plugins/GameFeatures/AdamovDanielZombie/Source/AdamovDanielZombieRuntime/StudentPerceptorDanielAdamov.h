@@ -48,15 +48,15 @@ public:
 	
 protected:
 	UPROPERTY(EditAnywhere, Category = "Perceptor")
-	float RefreshInterval{ 0.25f };
+	float RefreshInterval{ 0.5f };
 	
 	// How long a zombie survivor no longer sees stays in "memory"
 	UPROPERTY(EditAnywhere, Category = "Perceptor")
-	float ThreatMemoryDuration{ 5.0f };
+	float ThreatMemoryDuration{ 5.f };
 	
 	// Distance at which survivor consider house checked
 	UPROPERTY(EditAnywhere, Category = "Perceptor")
-	float HouseVisitedRange{ 350.0f };
+	float HouseVisitedRange{ 350.f };
 	
 private:
 	TArray<FPerceivedActor> Zombies;
@@ -65,17 +65,28 @@ private:
 	
 	FTimerHandle RefreshTimer;
 	
+	// Called in OnPerceptionUpdate
 	void HandleSight(AActor* Actor, const FAIStimulus& Stimulus);
 	void HandleDamage(AActor* Actor, const FAIStimulus& Stimulus);
 	
-	void RefreshWorldMemory(); // Using thr Refresh Timer, updates the arrays
+	void RefreshWorldMemory(); // Clears stagnant memory and updates house perception
 	void WriteBlackboard();
+	
+	// ----- Hardest Logic of the class -----
+	AActor* SelectThreat() const; // Called in WriteBlackboard()
+	AActor* SelectTargetItem() const; // Called in WriteBlackboard()
+	AActor* SelectHouseTarget() const; // Called in WriteBlackboard()
 	
 	// Templated function so we can use it for a Zombie, Item and House
 	// Checks if an actor of a type already exists in the TArray
 	// TRecord is of type FPerceivedActor or derived
 	template<typename TRecord>
 	TRecord* FindRecord(TArray<TRecord>& Container, const AActor* Key) const;
+	
+	// BB getters:
+	UBlackboardComponent* GetBlackboard() const;
+	float GetHealthPct() const noexcept;
+	float GetStaminaPct() const noexcept;
 };
 
 template <typename TRecord>

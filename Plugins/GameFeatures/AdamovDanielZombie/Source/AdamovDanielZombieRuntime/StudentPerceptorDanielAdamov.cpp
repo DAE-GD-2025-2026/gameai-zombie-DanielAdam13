@@ -1,5 +1,7 @@
 ﻿#include "StudentPerceptorDanielAdamov.h"
 
+#include "AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Items/BaseItem.h"
 #include "Village/House/House.h"
 #include "Zombies/BaseZombie.h"
@@ -132,12 +134,100 @@ void UStudentPerceptorDanielAdamov::HandleSight(AActor* Actor, const FAIStimulus
 
 void UStudentPerceptorDanielAdamov::HandleDamage(AActor* Actor, const FAIStimulus& Stimulus)
 {
+	// Only zombie can damage survivor
+	if (!Cast<ABaseZombie>( Actor ))
+		return;
+	
+	FPerceivedActor* Record{ FindRecord( Zombies, Actor ) };
+	// If no record of zombie-> populate the Record and push to TArray
+	if (!Record)
+	{
+		Record = &Zombies.AddDefaulted_GetRef();
+		Record->Actor = Actor;
+	}
+	if (Stimulus.WasSuccessfullySensed())
+	{
+		Record->LastKnownLocation = Stimulus.StimulusLocation;
+	}
+	
+	Record->LastSeenTime = GetWorld()->GetTimeSeconds();
 }
 
 void UStudentPerceptorDanielAdamov::RefreshWorldMemory()
+{
+	const float TimeNow{ static_cast<float>(GetWorld()->GetTimeSeconds()) };
+	
+	// 1. Remove stagnant memory
+	Items.RemoveAll( [](const FPerceivedItem& R)
+	{
+		return !R.Actor.IsValid() || R.Actor->IsHidden();
+	});
+	Zombies.RemoveAll([&](const FPerceivedActor& R)
+	{
+		return !R.Actor.IsValid() || (!R.bIsVisible && (TimeNow - R.LastSeenTime) > ThreatMemoryDuration);
+	});
+	Houses.RemoveAll([](const FPerceivedHouse& R)
+	{
+		return !R.Actor.IsValid();
+	});
+	
+	// 2. Update Houses visited flag
+	if (const AActor* Owner = GetOwner())
+	{
+		const FVector MyLocation{ Owner->GetActorLocation() };
+		for (FPerceivedHouse& H : Houses)
+		{
+			if (!H.bVisited && FVector::Dist( MyLocation, H.LastKnownLocation ) <= HouseVisitedRange)
+			{
+				H.bVisited = true;
+			}
+		}
+	}
+	
+	// 3. Write after refreshing
+	WriteBlackboard();
+}
+
+AActor* UStudentPerceptorDanielAdamov::SelectThreat() const
+{
+	
+}
+
+AActor* UStudentPerceptorDanielAdamov::SelectTargetItem() const
+{
+}
+
+AActor* UStudentPerceptorDanielAdamov::SelectHouseTarget() const
 {
 }
 
 void UStudentPerceptorDanielAdamov::WriteBlackboard()
 {
+	UBlackboardComponent* BB{ GetBlackboard() };
+	if (!BB)
+		return;
+	
+	//BB->SetValueAsObject( SurvivorBBKeys::ThreatActor )
+}
+
+UBlackboardComponent* UStudentPerceptorDanielAdamov::GetBlackboard() const
+{
+	const APawn* Pawn{ Cast<APawn>( GetOwner() ) };
+	const AAIController* AI{ Pawn ? Cast<AAIController>( Pawn->GetController() ) : nullptr };
+	
+	return AI ? AI->GetBlackboardComponent() : nullptr;
+}
+
+float UStudentPerceptorDanielAdamov::GetHealthPct() const noexcept
+{
+	const UHealthComponent* H{ GetOwner()->FindComponentByClass<UHealthComponent>() };
+	const float HealthPct{ H->GetHealth() / FMath::Max(1.f, static_cast<float>(H->GetMaxHealth())) };
+	return H ? HealthPct : 1.f;
+}
+
+float UStudentPerceptorDanielAdamov::GetStaminaPct() const noexcept
+{
+	const UStaminaComponent* S{ GetOwner()->FindComponentByClass<UStaminaComponent>() };
+	const float StaminaPct{ S->GetCurrentStamina() / FMath::Max(1.f, static_cast<float>(S->GetMaxStamina())) };
+	return S ? StaminaPct : 1.f;
 }
