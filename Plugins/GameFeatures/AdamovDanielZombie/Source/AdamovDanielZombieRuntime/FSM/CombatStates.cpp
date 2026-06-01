@@ -23,6 +23,11 @@ AActor* FCombatState::GetThreatActor() const noexcept
 	return BB ? Cast<AActor>( BB->GetValueAsObject( Context.ThreatKeyName ) ) : nullptr;
 }
 
+FEngageState::FEngageState(const FCombatContext& InContext)
+	:FCombatState( InContext )
+{
+}
+
 void FEngageState::OnEnter()
 {
 	FireTimer = 0.f;
@@ -53,6 +58,11 @@ void FEngageState::OnUpdate(float DeltaTime)
 			FireTimer -= DeltaTime;
 		}
 	}
+}
+
+FRepositionState::FRepositionState(const FCombatContext& InContext)
+	:FCombatState( InContext )
+{
 }
 
 void FRepositionState::OnUpdate(float DeltaTime)

@@ -15,9 +15,8 @@ struct FCombatContext
 class FCombatState : public GameAI::FSM::State
 {
 public:
-	virtual ~FCombatState() override = default; 
-	
 	explicit FCombatState(const FCombatContext& InContext);
+	virtual ~FCombatState() override = default; 
 	
 protected:
 	APawn* GetPawn() const noexcept;
@@ -28,6 +27,7 @@ protected:
 class FEngageState final : public FCombatState
 {
 public:
+	explicit FEngageState(const FCombatContext& InContext);
 	virtual ~FEngageState() override = default;
 	
 	virtual void OnEnter() override;
@@ -35,12 +35,12 @@ public:
 	
 private:
 	float FireTimer{ 0.f };
-	
 };
 
 class FRepositionState final : public FCombatState
 {
 public:
+	explicit FRepositionState(const FCombatContext& InContext);
 	virtual ~FRepositionState() override = default;
 	
 	virtual void OnUpdate(float DeltaTime) override;
