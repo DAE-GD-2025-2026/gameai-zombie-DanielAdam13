@@ -95,6 +95,16 @@ private:
 	UBlackboardComponent* GetBlackboard() const;
 	float GetHealthPct() const noexcept; // Used for Item Priority
 	float GetStaminaPct() const noexcept;  // Used for Item Priority
+	
+	// Stuck guard issue with infinite MoveTo: nullptr loop in the InvestigateHouse Sequence
+	UPROPERTY(EditAnywhere, Category = "Perceptor") 
+	float StuckTimeout{ 3.f };
+	UPROPERTY(EditAnywhere, Category = "Perceptor") 
+	float StuckMoveThreshold{ 2.f };
+	FVector LastRefreshLocation{ FVector::ZeroVector };
+	float StuckTime{ 0.f };
+	
+	void UpdateStuckGuard(const FVector& MyLoc);
 };
 
 template <typename TRecord>

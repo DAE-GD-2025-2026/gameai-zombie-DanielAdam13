@@ -172,18 +172,23 @@ void UStudentPerceptorDanielAdamov::RefreshWorldMemory()
 		return !R.Actor.IsValid();
 	});
 	
+	FVector MyLocation{};
 	// 2. Update Houses visited flag
 	if (const AActor* Owner = GetOwner())
 	{
-		const FVector MyLocation{ Owner->GetActorLocation() };
-		for (FPerceivedHouse& H : Houses)
+		MyLocation = Owner->GetActorLocation();
+	}
+	
+	for (FPerceivedHouse& H : Houses)
+	{
+		if (!H.bVisited && FVector::Dist2D( MyLocation, H.LastKnownLocation ) <= HouseVisitedRange)
 		{
-			if (!H.bVisited && FVector::Dist( MyLocation, H.LastKnownLocation ) <= HouseVisitedRange)
-			{
-				H.bVisited = true;
-			}
+			H.bVisited = true;
 		}
 	}
+	
+	// !!! Stuck bug when inside house visited range but MoveTo reporting success when out of house !!!
+	UpdateStuckGuard( MyLocation );
 	
 	// 3. Write after refreshing
 	WriteBlackboard();
@@ -358,4 +363,32 @@ float UStudentPerceptorDanielAdamov::GetStaminaPct() const noexcept
 	const UStaminaComponent* S{ GetOwner()->FindComponentByClass<UStaminaComponent>() };
 	const float StaminaPct{ S->GetCurrentStamina() / FMath::Max(1.f, static_cast<float>(S->GetMaxStamina())) };
 	return S ? StaminaPct : 1.f;
+}
+
+void UStudentPerceptorDanielAdamov::UpdateStuckGuard(const FVector& MyLoc)
+{
+	AActor* HouseTarget{ SelectHouseTarget() };
+	
+	// Only guard while a house is not null and NOT INVESTIGATING item
+	const bool bPursuingHouse{ (HouseTarget != nullptr) && (SelectTargetItem() == nullptr) };
+	if (!bPursuingHouse)
+	{
+		StuckTime = 0.f;
+		LastRefreshLocation = MyLoc;
+		return;
+	}
+	
+	const float Moved{  static_cast<float>( FVector::Dist2D( MyLoc, LastRefreshLocation ) ) };
+	LastRefreshLocation = MyLoc;
+	
+	StuckTime = (Moved < StuckMoveThreshold) ? StuckTime + RefreshInterval : 0.f;
+	
+	if (StuckTime >= StuckTimeout)
+	{
+		if (FPerceivedHouse* H = FindRecord( Houses, HouseTarget ))
+		{
+			H->bVisited = true;
+		}
+		StuckTime = 0.f;
+	}
 }
