@@ -1,17 +1,17 @@
-#include "BTTask_FindDiscoveryLocation.h"
+#include "BTTask_FindDiscoveryLocation_DanA.h"
 
 #include "AIController.h"
 #include "NavigationSystem.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
-UBTTask_FindDiscoveryLocation::UBTTask_FindDiscoveryLocation()
+UBTTask_FindDiscoveryLocation_DanA::UBTTask_FindDiscoveryLocation_DanA()
 {
 	NodeName = TEXT( "Find Discovery Location" );
 	TargetLocationKey.AddVectorFilter( 
-		this, GET_MEMBER_NAME_CHECKED( UBTTask_FindDiscoveryLocation, TargetLocationKey ));
+		this, GET_MEMBER_NAME_CHECKED( UBTTask_FindDiscoveryLocation_DanA, TargetLocationKey ));
 }
 
-EBTNodeResult::Type UBTTask_FindDiscoveryLocation::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UBTTask_FindDiscoveryLocation_DanA::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	// Task requires a valid AIController and Pawn as well as a valid Nav System
 	const AAIController* Controller{ OwnerComp.GetAIOwner() };

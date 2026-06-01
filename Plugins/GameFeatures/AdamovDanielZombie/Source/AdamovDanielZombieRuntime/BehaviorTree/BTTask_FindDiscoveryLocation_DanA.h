@@ -2,18 +2,18 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "BTTask_FindDiscoveryLocation.generated.h"
+#include "BTTask_FindDiscoveryLocation_DanA.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ADAMOVDANIELZOMBIERUNTIME_API UBTTask_FindDiscoveryLocation : public UBTTaskNode
+class ADAMOVDANIELZOMBIERUNTIME_API UBTTask_FindDiscoveryLocation_DanA : public UBTTaskNode
 {
 	GENERATED_BODY()
 	
 public:
-	UBTTask_FindDiscoveryLocation();
+	UBTTask_FindDiscoveryLocation_DanA();
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	
 protected:

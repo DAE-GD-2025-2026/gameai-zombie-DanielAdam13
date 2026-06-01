@@ -9,6 +9,8 @@
 #include "Perception/AISense_Damage.h"
 #include "StudentPerceptorDanielAdamov.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE( FOnInventoryChanged );
+
 enum class EItemType : uint8;
 
 // ----------- Remembered Targets Structs -----------
@@ -45,6 +47,10 @@ public:
 
 	UFUNCTION()
 	virtual void OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
+	
+	// Fired from the Grab Task when item grabbed
+	UPROPERTY(BlueprintAssignable, Category = "Perceptor")
+	FOnInventoryChanged OnInventoryChanged;
 	
 protected:
 	UPROPERTY(EditAnywhere, Category = "Perceptor")

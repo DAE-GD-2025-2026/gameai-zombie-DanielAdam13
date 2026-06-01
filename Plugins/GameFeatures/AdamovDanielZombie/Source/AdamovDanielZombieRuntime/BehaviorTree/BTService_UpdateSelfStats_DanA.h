@@ -2,18 +2,18 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTService.h"
-#include "BTService_UpdateSelfStats.generated.h"
+#include "BTService_UpdateSelfStats_DanA.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ADAMOVDANIELZOMBIERUNTIME_API UBTService_UpdateSelfStats : public UBTService
+class ADAMOVDANIELZOMBIERUNTIME_API UBTService_UpdateSelfStats_DanA : public UBTService
 {
 	GENERATED_BODY()
 	
 public:
-	UBTService_UpdateSelfStats();
+	UBTService_UpdateSelfStats_DanA();
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 	
 protected:
