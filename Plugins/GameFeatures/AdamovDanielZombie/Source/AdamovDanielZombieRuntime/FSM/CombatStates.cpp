@@ -55,7 +55,7 @@ void FEngageState::OnUpdate(float DeltaTime)
 	{
 		if (TryFireWeapon( *Pawn ))
 		{
-			FireTimer -= DeltaTime;
+			FireTimer = 0.f;
 		}
 	}
 }
@@ -77,7 +77,7 @@ void FRepositionState::OnUpdate(float DeltaTime)
 	
 	// 1. Flee and Face the Threat by APPLYING the Face behavior
 	const Steering::FSteeringState State{ Steering::MakeState( *Pawn ) };
-	Steering::Face FleeBehavior;
+	Steering::Flee FleeBehavior;
 	Steering::Face FaceBehavior;
 	FleeBehavior.SetTargetPosition( ThrLoc2D );
 	FaceBehavior.SetTargetPosition( ThrLoc2D );
