@@ -13,6 +13,8 @@ namespace SurvivorBBKeys
 	static const FName ThreatActor { TEXT("ThreatActor") };
 	static const FName TargetItem { TEXT("TargetItem") };
 	static const FName KnownHouseTarget { TEXT("KnownHouseTarget") };
+	static const FName ThreatSpeed { TEXT("ThreatSpeed") };
+	static const FName NearCount { TEXT("NearCount") };
 }
 
 UStudentPerceptorDanielAdamov::UStudentPerceptorDanielAdamov()
@@ -179,11 +181,20 @@ void UStudentPerceptorDanielAdamov::RefreshWorldMemory()
 		MyLocation = Owner->GetActorLocation();
 	}
 	
+	// Essential for House Investigate Task:
 	for (FPerceivedHouse& H : Houses)
 	{
 		if (!H.bVisited && FVector::Dist2D( MyLocation, H.LastKnownLocation ) <= HouseVisitedRange)
 		{
 			H.bVisited = true;
+		}
+	}
+	
+	for (FPerceivedActor& Z : Zombies)
+	{
+		if (Z.Actor.IsValid() && Z.bIsVisible)
+		{
+			Z.MaxObservedSpeed = FMath::Max( Z.MaxObservedSpeed, Z.Actor->GetVelocity().Size2D() );
 		}
 	}
 	
@@ -338,9 +349,35 @@ void UStudentPerceptorDanielAdamov::WriteBlackboard() const
 	if (!BB)
 		return;
 	
-	BB->SetValueAsObject( SurvivorBBKeys::ThreatActor, SelectThreat() );
+	AActor* Threat{ SelectThreat() };
+	BB->SetValueAsObject( SurvivorBBKeys::ThreatActor, Threat );
 	BB->SetValueAsObject( SurvivorBBKeys::TargetItem, SelectTargetItem() );
 	BB->SetValueAsObject( SurvivorBBKeys::KnownHouseTarget, SelectHouseTarget() );
+	
+	// -----------------------------------
+	// Set Threat Information variables:
+	// -----------------------------------
+	float ThreatSpeed{ 0.f };
+	if (Threat)
+	{
+		if (const FPerceivedActor* R = FindRecord( Zombies, Threat ))
+		{
+			ThreatSpeed = R->MaxObservedSpeed;
+		}
+	}
+	BB->SetValueAsFloat( SurvivorBBKeys::ThreatSpeed, ThreatSpeed );
+	
+	int32 NearCount{ 0 };
+	const FVector MyLocation{ GetOwner()->GetActorLocation() };
+	for (const FPerceivedActor& Z : Zombies)
+	{
+		if (Z.Actor.IsValid() && FVector::Dist2D( MyLocation, Z.LastKnownLocation ) <= NearThreatRadius)
+		{
+			++NearCount;
+		}
+	}
+	BB->SetValueAsInt( SurvivorBBKeys::NearCount, NearCount );
+	
 }
 
 UBlackboardComponent* UStudentPerceptorDanielAdamov::GetBlackboard() const

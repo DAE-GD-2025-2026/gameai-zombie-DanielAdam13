@@ -21,6 +21,7 @@ struct FPerceivedActor
 	FVector LastKnownLocation{ FVector::ZeroVector };
 	float LastSeenTime{ 0.f };
 	bool bIsVisible{ false };
+	float MaxObservedSpeed{ 0.f };
 };
 // For items
 struct FPerceivedItem : FPerceivedActor
@@ -64,6 +65,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Perceptor")
 	float HouseVisitedRange{ 350.f };
 	
+	// Distance for Near Count - how close a zombie is to be considered "Near"
+	UPROPERTY(EditAnywhere, Category = "Perceptor")
+	float NearThreatRadius{ 1500.f };
+	
 private:
 	TArray<FPerceivedActor> Zombies;
 	TArray<FPerceivedItem> Items;
@@ -89,7 +94,7 @@ private:
 	// Checks if an actor of a type already exists in the TArray
 	// TRecord is of type FPerceivedActor or derived
 	template<typename TRecord>
-	TRecord* FindRecord(TArray<TRecord>& Container, const AActor* Key) const;
+	TRecord* FindRecord(const TArray<TRecord>& Container, const AActor* Key) const;
 	
 	// BB getters:
 	UBlackboardComponent* GetBlackboard() const;
@@ -108,7 +113,7 @@ private:
 };
 
 template <typename TRecord>
-TRecord* UStudentPerceptorDanielAdamov::FindRecord(TArray<TRecord>& Container, const AActor* Key) const
+TRecord* UStudentPerceptorDanielAdamov::FindRecord(const TArray<TRecord>& Container, const AActor* Key) const
 {
 	// TRecord is of FPerceivedActor or derived structs type
 	for (TRecord& R : Container)
