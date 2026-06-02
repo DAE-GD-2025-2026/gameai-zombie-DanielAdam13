@@ -18,7 +18,7 @@ UBTTask_Combat_DanA::UBTTask_Combat_DanA()
 
 EBTNodeResult::Type UBTTask_Combat_DanA::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	// Task requires vali AiController and Pawn
+	// Task requires vali AiController, Pawn and BB
 	AAIController* Controller{ OwnerComp.GetAIOwner() };
 	const APawn* Pawn{ Controller ? Controller->GetPawn() : nullptr };
 	UBlackboardComponent* BB{ OwnerComp.GetBlackboardComponent() };
