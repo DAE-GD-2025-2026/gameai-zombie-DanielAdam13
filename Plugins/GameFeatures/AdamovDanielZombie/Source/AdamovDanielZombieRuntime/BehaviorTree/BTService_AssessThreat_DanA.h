@@ -28,6 +28,8 @@ protected:
 	FBlackboardKeySelector HealthPctKey;
 	UPROPERTY(EditAnywhere, Category = "Assess") 
 	FBlackboardKeySelector ShouldFleeKey;
+	UPROPERTY(EditAnywhere, Category = "Assess") 
+	FBlackboardKeySelector CombatStuckKey;
 	
 	UPROPERTY(EditAnywhere, Category = "Assess") 
 	float CriticalHealthPct{ 0.30f };

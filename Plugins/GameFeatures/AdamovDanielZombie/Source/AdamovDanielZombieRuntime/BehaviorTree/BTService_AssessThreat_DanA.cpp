@@ -31,11 +31,18 @@ void UBTService_AssessThreat_DanA::TickNode(UBehaviorTreeComponent& OwnerComp, u
 	if (!Pawn || !BB) 
 		return;
 	
-	// If no Threat -> early out AND set Should Flee to FALSE
+	// No Threat -> early out AND set Should Flee to FALSE
 	if (!BB->GetValueAsObject( ThreatActorKey.SelectedKeyName ))
 	{
+		BB->SetValueAsBool( CombatStuckKey.SelectedKeyName, false );
 		BB->SetValueAsBool( ShouldFleeKey.SelectedKeyName, false );
 		return;
+	}
+	// IF COMBAT STUCK -> Go to Flee
+	if (BB->GetValueAsBool( CombatStuckKey.SelectedKeyName ))
+	{
+		BB->SetValueAsBool( ShouldFleeKey.SelectedKeyName, false );
+		return; // and early ouy
 	}
 	
 	bool bFlee{ false };
