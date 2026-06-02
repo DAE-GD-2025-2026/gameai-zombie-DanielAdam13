@@ -340,7 +340,7 @@ AActor* UStudentPerceptorDanielAdamov::SelectHouseTarget() const
 	return BestHouse;
 }
 
-void UStudentPerceptorDanielAdamov::WriteBlackboard() const
+void UStudentPerceptorDanielAdamov::WriteBlackboard()
 {
 	// This is being called every frame and on every Refresh World Memory...
 	// It is needed I think because targets are constantly updated...

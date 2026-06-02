@@ -21,7 +21,7 @@ struct FPerceivedActor
 	FVector LastKnownLocation{ FVector::ZeroVector };
 	float LastSeenTime{ 0.f };
 	bool bIsVisible{ false };
-	float MaxObservedSpeed{ 0.f };
+	float MaxObservedSpeed{ 0.f }; // Needed for Should Flee calculations
 };
 // For items
 struct FPerceivedItem : FPerceivedActor
@@ -81,7 +81,7 @@ private:
 	void HandleDamage(AActor* Actor, const FAIStimulus& Stimulus);
 	
 	void RefreshWorldMemory(); // Clears stagnant memory and updates house perception
-	void WriteBlackboard() const;
+	void WriteBlackboard();
 	
 	// ----- Hardest Logic of the class -----
 	AActor* SelectThreat() const; // Called in WriteBlackboard()
@@ -94,7 +94,7 @@ private:
 	// Checks if an actor of a type already exists in the TArray
 	// TRecord is of type FPerceivedActor or derived
 	template<typename TRecord>
-	TRecord* FindRecord(const TArray<TRecord>& Container, const AActor* Key) const;
+	TRecord* FindRecord(TArray<TRecord>& Container, const AActor* Key) const;
 	
 	// BB getters:
 	UBlackboardComponent* GetBlackboard() const;
@@ -113,7 +113,7 @@ private:
 };
 
 template <typename TRecord>
-TRecord* UStudentPerceptorDanielAdamov::FindRecord(const TArray<TRecord>& Container, const AActor* Key) const
+TRecord* UStudentPerceptorDanielAdamov::FindRecord(TArray<TRecord>& Container, const AActor* Key) const
 {
 	// TRecord is of FPerceivedActor or derived structs type
 	for (TRecord& R : Container)
