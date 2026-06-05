@@ -86,21 +86,24 @@ void FRepositionState::OnUpdate(float DeltaTime)
 	const float DistanceNow{ static_cast<float>( FVector::Dist2D( Pawn->GetActorLocation(), ThrLocation ) ) };
 	
 	// 1. 
-	if (LastDistance == TNumericLimits<float>::Max())
-	{
-		LastDistance = DistanceNow;
-	}
-	// 2. Check if gaining distance
-	if (DistanceNow > LastDistance + Context.DistanceGainEpsilon)
-	{
-		StuckTime = 0.f;
-		LastDistance = DistanceNow;
-	}
-	else
-	{
-		// Stuck in reposition
-		StuckTime += DeltaTime;
-	}
+	// if (LastDistance == TNumericLimits<float>::Max())
+	// {
+	// 	LastDistance = DistanceNow;
+	// }
+	// // 2. Check if gaining distance
+	// if (DistanceNow > LastDistance + Context.DistanceGainEpsilon)
+	// {
+	// 	StuckTime = 0.f;
+	// 	LastDistance = DistanceNow;
+	// }
+	// else
+	// {
+	// 	// Stuck in reposition
+	// 	StuckTime += DeltaTime;
+	// }
+	//
+	// Stuck in reposition
+	StuckTime += DeltaTime;
 	
 	// 3. If stuck -> set stuck flag which will abort Combat in the BT
 	if (StuckTime >= Context.GiveUpTime)

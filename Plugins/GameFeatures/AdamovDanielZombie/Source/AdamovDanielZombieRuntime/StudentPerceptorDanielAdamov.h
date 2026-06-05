@@ -68,7 +68,7 @@ protected:
 	
 	// Radius including the kill radius of a purge where survivor starts fleeing
 	UPROPERTY(EditAnywhere, Category = "Perceptor") 
-	float PurgeSafetyRadius{ 350.f };
+	float PurgeSafetyRadius{ 150.f };
 	
 private:
 	TArray<FPerceivedActor> Zombies;
@@ -108,7 +108,7 @@ private:
 	float StuckTimeout{ 3.f };
 	UPROPERTY(EditAnywhere, Category = "Perceptor") 
 	float StuckMoveThreshold{ 2.f };
-	FVector LastRefreshLocation{ FVector::ZeroVector };
+	float LastDistanceToHouse{ TNumericLimits<float>::Max() };
 	float StuckTime{ 0.f };
 	
 	void UpdateStuckGuard(const FVector& MyLoc);

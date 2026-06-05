@@ -10,8 +10,8 @@ struct FCombatContext
 	float SafeDistance{ 450.f };
 	float FireCooldown{ 0.5f };
 	float AlignToleranceDeg{ 12.f };
-	float DistanceGainEpsilon{ 2.f };   // min distance gain per check to count as "making progress"
-	float GiveUpTime{ 1.f }; // seconds of no progress before deciding to go from Combat -> Flee
+	float DistanceGainEpsilon{ 5.f };   // min distance gain per check to count as "making progress"
+	float GiveUpTime{ 2.f }; // seconds of no progress before deciding to go from Combat -> Flee
 };
 
 class FCombatState : public GameAI::FSM::State

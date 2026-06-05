@@ -449,21 +449,29 @@ float UStudentPerceptorDanielAdamov::GetStaminaPct() const noexcept
 
 void UStudentPerceptorDanielAdamov::UpdateStuckGuard(const FVector& MyLoc)
 {
-	AActor* HouseTarget{ SelectHouseTarget() };
+	const AActor* HouseTarget{ SelectHouseTarget() };
 	
 	// Only guard while a house is not null and NOT INVESTIGATING item
 	const bool bPursuingHouse{ (HouseTarget != nullptr) && (SelectTargetItem() == nullptr) };
 	if (!bPursuingHouse)
 	{
-		StuckTime = 0.f;
-		LastRefreshLocation = MyLoc;
+		StuckTime = 0.f;	
+		LastDistanceToHouse = TNumericLimits<float>::Max();
 		return;
 	}
 	
-	const float Moved{  static_cast<float>( FVector::Dist2D( MyLoc, LastRefreshLocation ) ) };
-	LastRefreshLocation = MyLoc;
+	const float DistNow{ static_cast<float>( FVector::Dist2D(MyLoc, HouseTarget->GetActorLocation()) )};
 	
-	StuckTime = (Moved < StuckMoveThreshold) ? StuckTime + RefreshInterval : 0.f;
+	// Reset only when progress is made towards the house
+	if (DistNow < LastDistanceToHouse - StuckMoveThreshold)
+	{
+		StuckTime = 0.f;
+		LastDistanceToHouse = DistNow;
+	}
+	else
+	{
+		StuckTime += RefreshInterval;
+	}
 	
 	if (StuckTime >= StuckTimeout)
 	{
@@ -472,6 +480,7 @@ void UStudentPerceptorDanielAdamov::UpdateStuckGuard(const FVector& MyLoc)
 			H->bVisited = true;
 		}
 		StuckTime = 0.f;
+		LastDistanceToHouse = TNumericLimits<float>::Max();
 	}
 }
 

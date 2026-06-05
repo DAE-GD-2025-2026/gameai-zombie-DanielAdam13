@@ -41,7 +41,7 @@ void UBTService_AssessThreat_DanA::TickNode(UBehaviorTreeComponent& OwnerComp, u
 	// IF COMBAT STUCK -> Go to Flee
 	if (BB->GetValueAsBool( CombatStuckKey.SelectedKeyName ))
 	{
-		BB->SetValueAsBool( ShouldFleeKey.SelectedKeyName, false );
+		BB->SetValueAsBool( ShouldFleeKey.SelectedKeyName, true );
 		return; // and early ouy
 	}
 	
