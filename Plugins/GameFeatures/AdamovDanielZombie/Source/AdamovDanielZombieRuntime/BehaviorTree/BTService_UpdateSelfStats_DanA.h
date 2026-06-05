@@ -4,9 +4,9 @@
 #include "BehaviorTree/BTService.h"
 #include "BTService_UpdateSelfStats_DanA.generated.h"
 
-/**
- * 
- */
+// One of the most important parts of the whole project:
+// Checks things that need to always be updated - health, stamina, Inventory slot info
+// + took damage key since Damage Stimuli does not work
 UCLASS()
 class ADAMOVDANIELZOMBIERUNTIME_API UBTService_UpdateSelfStats_DanA : public UBTService
 {
