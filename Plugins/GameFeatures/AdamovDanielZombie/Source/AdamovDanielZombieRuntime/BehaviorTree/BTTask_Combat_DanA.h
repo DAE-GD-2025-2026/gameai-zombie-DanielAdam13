@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "../FSM/FSM.h"
+#include "../FSM/FSM_DanA.h"
 #include "BTTask_Combat_DanA.generated.h"
 
 /**
@@ -38,6 +38,6 @@ protected:
 	float AlightToleranceDeg{ 12.f };
 	
 	void BuildFSM(AAIController& Controller, UBlackboardComponent& Blackboard);
-	TUniquePtr<GameAI::FSM::FSM> FSMInstance;
+	TUniquePtr<GameAI::FSM::FSM_DanA> FSMInstance;
 	
 };

@@ -1,21 +1,20 @@
-﻿#include "FSM.h"
+﻿#include "FSM_DanA.h"
 
-#include "State.h"
-#include "Transition.h"
+#include "Transition_DanA.h"
 
 using namespace GameAI::FSM;
 
-void FSM::SetBlackboard(UBlackboardComponent* InBlackboard)
+void FSM_DanA::SetBlackboard(UBlackboardComponent* InBlackboard)
 {
 	Blackboard = InBlackboard;
 }
 
-void FSM::SetController(AAIController* InController)
+void FSM_DanA::SetController(AAIController* InController)
 {
 	Controller = InController;
 }
 
-State* FSM::AddState(std::unique_ptr<State>&& NewState)
+State_DanA* FSM_DanA::AddState(std::unique_ptr<State_DanA>&& NewState)
 {
 	if (!NewState) 
 		return nullptr;
@@ -23,12 +22,12 @@ State* FSM::AddState(std::unique_ptr<State>&& NewState)
 	NewState->SetBlackboard( Blackboard );
 	NewState->SetController( Controller );
 	
-	State* RawState{ NewState.get() };
+	State_DanA* RawState{ NewState.get() };
 	StatesContainer.push_back( std::move(NewState) );
 	return RawState;
 }
 
-void FSM::AddTransition(State* From, State* To, std::function<bool()> Condition)
+void FSM_DanA::AddTransition(State_DanA* From, State_DanA* To, std::function<bool()> Condition)
 {
 	if (!From || !To || !Condition)
 		return;
@@ -36,7 +35,7 @@ void FSM::AddTransition(State* From, State* To, std::function<bool()> Condition)
 	TransitionsContainer[From].emplace_back( From, To, Condition );
 }
 
-void FSM::Start()
+void FSM_DanA::Start()
 {
 	if (bRunning || StatesContainer.empty())
 		return;
@@ -49,7 +48,7 @@ void FSM::Start()
 		CurrentState->OnEnter();
 }
 
-void FSM::Stop()
+void FSM_DanA::Stop()
 {
 	if (!bRunning)
 		return;
@@ -62,7 +61,7 @@ void FSM::Stop()
 	bRunning = false;
 }
 
-void FSM::Tick(float DeltaTime)
+void FSM_DanA::Tick(float DeltaTime)
 {
 	if (!bRunning || !CurrentState)
 		return;
@@ -74,7 +73,7 @@ void FSM::Tick(float DeltaTime)
 	if (It != TransitionsContainer.end())
 	{
 		// First one to be evaluated true
-		for (const Transition& t : It->second)
+		for (const Transition_DanA& t : It->second)
 		{
 			if (t.Evaluate())
 			{
@@ -85,12 +84,12 @@ void FSM::Tick(float DeltaTime)
 	}
 }
 
-bool FSM::IsRunning() const noexcept
+bool FSM_DanA::IsRunning() const noexcept
 {
 	return bRunning;
 }
 
-void FSM::ChangeState(State* NewState)
+void FSM_DanA::ChangeState(State_DanA* NewState)
 {
 	if (CurrentState == NewState)
 		return;

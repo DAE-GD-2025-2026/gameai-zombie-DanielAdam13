@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "CoreMinimal.h"
-#include "State.h"
+#include "State_DanA.h"
 
 struct FCombatContext
 {
@@ -13,7 +13,7 @@ struct FCombatContext
 	float GiveUpTime{ 2.f }; // seconds of no progress before deciding to go from Combat -> Flee
 };
 
-class FCombatState : public GameAI::FSM::State
+class FCombatState : public GameAI::FSM::State_DanA
 {
 public:
 	explicit FCombatState(const FCombatContext& InContext);

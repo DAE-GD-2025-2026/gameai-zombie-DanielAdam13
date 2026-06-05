@@ -6,10 +6,10 @@ class UBlackboardComponent;
 namespace GameAI::FSM
 {
 	// Base State class
-	class State
+	class State_DanA
 	{
 	public:
-		virtual ~State() = default;
+		virtual ~State_DanA() = default;
 		virtual void OnEnter() {};
 		virtual void OnUpdate(float DeltaTime) {};
 		virtual void OnExit() {};

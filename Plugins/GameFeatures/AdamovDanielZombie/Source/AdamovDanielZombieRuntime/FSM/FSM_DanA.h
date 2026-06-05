@@ -1,28 +1,28 @@
 ﻿#pragma once
-
-class AAIController;
-class UBlackboardComponent;
+#include "State_DanA.h"
+#include "Transition_DanA.h"
 
 #include <memory>
 #include <functional>
 #include <vector>
 #include <unordered_map>
 
+class AAIController;
+class UBlackboardComponent;
+
 namespace GameAI::FSM
 {
-	class Transition;
-	class State;
 	// Owns and manages States and Transitions.
 	// Holds the current State.
-	class FSM final
+	class FSM_DanA final
 	{
 	public:
 		void SetBlackboard(UBlackboardComponent* InBlackboard);
 		void SetController(AAIController* InController);
 		
 		// Transfer ownership
-		State* AddState(std::unique_ptr<State>&& NewState);
-		void AddTransition(State* From, State* To, std::function<bool()> Condition);
+		State_DanA* AddState(std::unique_ptr<State_DanA>&& NewState);
+		void AddTransition(State_DanA* From, State_DanA* To, std::function<bool()> Condition);
 		
 		void Start();
 		void Stop();
@@ -31,16 +31,16 @@ namespace GameAI::FSM
 		bool IsRunning() const noexcept;
 		
 	private:
-		std::vector<std::unique_ptr<State>> StatesContainer{};
+		std::vector<std::unique_ptr<State_DanA>> StatesContainer{};
 		// Multiple Transitions PER state
-		std::unordered_map<State*, std::vector<Transition>> TransitionsContainer{};
+		std::unordered_map<State_DanA*, std::vector<Transition_DanA>> TransitionsContainer{};
 		
-		State* CurrentState{ nullptr };
+		State_DanA* CurrentState{ nullptr };
 		UBlackboardComponent* Blackboard{ nullptr };
 		AAIController* Controller{ nullptr };
 		
 		bool bRunning{ false };
 		
-		void ChangeState(State* NewState);
+		void ChangeState(State_DanA* NewState);
 	};
 }

@@ -1,8 +1,8 @@
 #include "BTTask_Combat_DanA.h"
 
 #include "AIController.h"
-#include "AdamovDanielZombieRuntime/FSM/CombatStates.h"
-#include "../FSM/Transition.h"
+#include "AdamovDanielZombieRuntime/FSM/CombatStates_DanA.h"
+#include "../FSM/Transition_DanA.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 UBTTask_Combat_DanA::UBTTask_Combat_DanA()
@@ -83,7 +83,7 @@ EBTNodeResult::Type UBTTask_Combat_DanA::AbortTask(UBehaviorTreeComponent& Owner
 void UBTTask_Combat_DanA::BuildFSM(AAIController& Controller, UBlackboardComponent& Blackboard)
 {
 	using namespace GameAI::FSM;
-	FSMInstance = MakeUnique<FSM>();
+	FSMInstance = MakeUnique<FSM_DanA>();
 	FSMInstance->SetController( &Controller );
 	FSMInstance->SetBlackboard( &Blackboard );
 	
@@ -96,8 +96,8 @@ void UBTTask_Combat_DanA::BuildFSM(AAIController& Controller, UBlackboardCompone
 	Ctx.FireCooldown = FireCooldown;
 	Ctx.AlignToleranceDeg = AlightToleranceDeg;
 	
-	State* Engage{ FSMInstance->AddState( std::make_unique<FEngageState>( Ctx ) ) };
-	State* Reposition{ FSMInstance->AddState( std::make_unique<FRepositionState>( Ctx ) ) };
+	State_DanA* Engage{ FSMInstance->AddState( std::make_unique<FEngageState>( Ctx ) ) };
+	State_DanA* Reposition{ FSMInstance->AddState( std::make_unique<FRepositionState>( Ctx ) ) };
 	
 	// Transitions
 	AAIController* C{ &Controller };

@@ -1,12 +1,12 @@
-﻿#include "CombatStates.h"
+﻿#include "CombatStates_DanA.h"
 
 #include "AIController.h"
-#include "AdamovDanielZombieRuntime/Steering/Steering.h"
+#include "AdamovDanielZombieRuntime/Steering/Steering_DanA.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Common/InventoryComponent.h"
 
 FCombatState::FCombatState(const FCombatContext& InContext)
-	:State::State(),
+	:State_DanA::State_DanA(),
 	Context( InContext )
 {
 }
