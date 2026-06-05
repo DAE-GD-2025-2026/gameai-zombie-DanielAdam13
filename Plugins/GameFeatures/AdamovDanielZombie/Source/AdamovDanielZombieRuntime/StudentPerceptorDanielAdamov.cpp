@@ -350,9 +350,10 @@ void UStudentPerceptorDanielAdamov::WriteBlackboard()
 		return;
 	
 	AActor* Threat{ SelectThreat() };
-	BB->SetValueAsObject( SurvivorBBKeys::ThreatActor, Threat );
-	BB->SetValueAsObject( SurvivorBBKeys::TargetItem, SelectTargetItem() );
-	BB->SetValueAsObject( SurvivorBBKeys::KnownHouseTarget, SelectHouseTarget() );
+	// Don't update if key Object has not changed - prevents constant switching
+	WriteObjectIfChanged( BB, SurvivorBBKeys::ThreatActor, Threat );
+	WriteObjectIfChanged( BB, SurvivorBBKeys::TargetItem, SelectTargetItem() );
+	WriteObjectIfChanged( BB, SurvivorBBKeys::KnownHouseTarget, SelectHouseTarget() );
 	
 	// -----------------------------------
 	// Set Threat Information variables:
@@ -427,5 +428,13 @@ void UStudentPerceptorDanielAdamov::UpdateStuckGuard(const FVector& MyLoc)
 			H->bVisited = true;
 		}
 		StuckTime = 0.f;
+	}
+}
+
+void UStudentPerceptorDanielAdamov::WriteObjectIfChanged(UBlackboardComponent* BB, const FName& Key, UObject* NewValue)
+{
+	if (BB->GetValueAsObject( Key ) != NewValue)
+	{
+		BB->SetValueAsObject( Key, NewValue );
 	}
 }

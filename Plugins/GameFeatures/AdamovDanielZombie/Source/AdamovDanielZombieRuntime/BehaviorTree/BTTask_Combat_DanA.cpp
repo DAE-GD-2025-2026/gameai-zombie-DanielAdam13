@@ -76,6 +76,8 @@ EBTNodeResult::Type UBTTask_Combat_DanA::AbortTask(UBehaviorTreeComponent& Owner
 		FSMInstance->Stop();
 	if (AAIController* C = OwnerComp.GetAIOwner())
 		C->StopMovement();
+	if (UBlackboardComponent* BB = OwnerComp.GetBlackboardComponent())
+		BB->SetValueAsBool(TEXT("bCombatStuck"), false);
 	
 	return EBTNodeResult::Aborted;
 }

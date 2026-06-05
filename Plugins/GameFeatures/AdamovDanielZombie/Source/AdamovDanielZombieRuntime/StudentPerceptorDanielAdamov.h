@@ -110,6 +110,7 @@ private:
 	float StuckTime{ 0.f };
 	
 	void UpdateStuckGuard(const FVector& MyLoc);
+	void WriteObjectIfChanged(UBlackboardComponent* BB, const FName& Key, UObject* NewValue);
 };
 
 template <typename TRecord>
