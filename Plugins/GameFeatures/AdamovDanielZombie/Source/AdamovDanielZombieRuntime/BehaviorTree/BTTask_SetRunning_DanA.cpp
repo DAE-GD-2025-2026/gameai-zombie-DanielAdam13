@@ -15,8 +15,9 @@ EBTNodeResult::Type UBTTask_SetRunning_DanA::ExecuteTask(UBehaviorTreeComponent&
 	ASurvivorPawn* Survivor{ Controller ? Cast<ASurvivorPawn>(Controller->GetPawn()) : nullptr };
 	if (!Survivor) 
 		return EBTNodeResult::Failed;
-	
-	if (bRun)
+
+	const UStaminaComponent* StaminaComp{ Survivor->FindComponentByClass<UStaminaComponent>() };
+	if (bRun && (StaminaComp && StaminaComp->GetCurrentStamina() > 0.f))
 		Survivor->StartRunning();
 	else
 		Survivor->StopRunning();
