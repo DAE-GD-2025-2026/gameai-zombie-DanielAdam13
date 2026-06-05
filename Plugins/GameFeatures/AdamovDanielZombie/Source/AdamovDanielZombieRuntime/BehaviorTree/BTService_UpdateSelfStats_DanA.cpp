@@ -21,6 +21,8 @@ UBTService_UpdateSelfStats_DanA::UBTService_UpdateSelfStats_DanA()
 		this, GET_MEMBER_NAME_CHECKED( UBTService_UpdateSelfStats_DanA, HasFoodKey ) );
 	HasMedkitKey.AddBoolFilter( 
 		this, GET_MEMBER_NAME_CHECKED( UBTService_UpdateSelfStats_DanA, HasMedkitKey ) );
+	TookDamageKey.AddBoolFilter( 
+		this, GET_MEMBER_NAME_CHECKED( UBTService_UpdateSelfStats_DanA, TookDamageKey) );
 }
 
 void UBTService_UpdateSelfStats_DanA::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
@@ -38,7 +40,15 @@ void UBTService_UpdateSelfStats_DanA::TickNode(UBehaviorTreeComponent& OwnerComp
 	if (const UHealthComponent* Health = Pawn->FindComponentByClass<UHealthComponent>())
 	{
 		const float MaxHP{ static_cast<float>(FMath::Max( 1, Health->GetMaxHealth() )) };
-		BB->SetValueAsFloat( HealthPctKey.SelectedKeyName, Health->GetHealth() / MaxHP );
+		const float CurrentHP{ static_cast<float>( Health->GetHealth() ) };
+		BB->SetValueAsFloat( HealthPctKey.SelectedKeyName, CurrentHP / MaxHP );
+		
+		// LastHealth is a private member -> used for checking if took damage
+		if (LastHealth >= 0.f && CurrentHP < LastHealth)
+		{
+			BB->SetValueAsBool( TookDamageKey.SelectedKeyName, true );
+		}
+		LastHealth = CurrentHP;
 	}
 	
 	// Stamina Comp from GameAI_Zombie

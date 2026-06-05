@@ -29,4 +29,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Stats")
 	FBlackboardKeySelector HasMedkitKey;
 	
+	UPROPERTY(EditAnywhere, Category="Stats")
+	FBlackboardKeySelector TookDamageKey;
+	
+private:
+	float LastHealth{ -1.f };
+	
 };
