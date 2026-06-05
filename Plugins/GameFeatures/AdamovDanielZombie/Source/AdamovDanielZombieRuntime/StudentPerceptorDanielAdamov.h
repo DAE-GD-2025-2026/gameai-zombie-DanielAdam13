@@ -21,7 +21,6 @@ struct FPerceivedActor
 	FVector LastKnownLocation{ FVector::ZeroVector };
 	float LastSeenTime{ 0.f };
 	bool bIsVisible{ false };
-	float MaxObservedSpeed{ 0.f }; // Needed for Should Flee calculations
 };
 // For items
 struct FPerceivedItem : FPerceivedActor

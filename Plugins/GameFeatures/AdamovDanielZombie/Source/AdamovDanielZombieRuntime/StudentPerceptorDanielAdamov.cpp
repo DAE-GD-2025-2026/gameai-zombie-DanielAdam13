@@ -190,13 +190,13 @@ void UStudentPerceptorDanielAdamov::RefreshWorldMemory()
 		}
 	}
 	
-	for (FPerceivedActor& Z : Zombies)
-	{
-		if (Z.Actor.IsValid() && Z.bIsVisible)
-		{
-			Z.MaxObservedSpeed = FMath::Max( Z.MaxObservedSpeed, Z.Actor->GetVelocity().Size2D() );
-		}
-	}
+	// for (FPerceivedActor& Z : Zombies)
+	// {
+	// 	if (Z.Actor.IsValid() && Z.bIsVisible)
+	// 	{
+	// 		Z.MaxObservedSpeed = FMath::Max( Z.MaxObservedSpeed, Z.Actor->GetVelocity().Size2D() );
+	// 	}
+	// }
 	
 	// !!! Stuck bug when inside house visited range but MoveTo reporting success when out of house !!!
 	UpdateStuckGuard( MyLocation );
@@ -287,9 +287,9 @@ int32 UStudentPerceptorDanielAdamov::GetItemPriority(EItemType ItemType, int32 V
 	case EItemType::Shotgun:
 		return bHasWeapon ? 30 : 100;
 	case EItemType::Medkit:
-		return Health < 0.5f ? 90 : 40;
+		return Health < 0.5f ? 90 : 30;
 	case EItemType::Food:
-		return Stamina < 0.4f ? 80 : 20;
+		return Stamina < 0.5f ? 80 : 40;
 	default:
 		return 0; // Garbage or unknown
 	}
@@ -356,14 +356,14 @@ void UStudentPerceptorDanielAdamov::WriteBlackboard()
 	WriteObjectIfChanged( BB, SurvivorBBKeys::KnownHouseTarget, SelectHouseTarget() );
 	
 	// -----------------------------------
-	// Set Threat Information variables:
+	// Set Threat Information variables - used for Combat/Flee tasks:
 	// -----------------------------------
 	float ThreatSpeed{ 0.f };
 	if (Threat)
 	{
-		if (const FPerceivedActor* R = FindRecord( Zombies, Threat ))
+		if (const UFloatingPawnMovement* Move = Threat->FindComponentByClass<UFloatingPawnMovement>())
 		{
-			ThreatSpeed = R->MaxObservedSpeed;
+			ThreatSpeed = Move->GetMaxSpeed();
 		}
 	}
 	BB->SetValueAsFloat( SurvivorBBKeys::ThreatSpeed, ThreatSpeed );
