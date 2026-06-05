@@ -4,6 +4,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Common/InventoryComponent.h"
 #include "Items/BaseItem.h"
+#include "PurgeZones/PurgeZone.h"
 #include "Village/House/House.h"
 #include "Zombies/BaseZombie.h"
 
@@ -13,6 +14,7 @@ namespace SurvivorBBKeys
 	static const FName ThreatActor { TEXT("ThreatActor") };
 	static const FName TargetItem { TEXT("TargetItem") };
 	static const FName KnownHouseTarget { TEXT("KnownHouseTarget") };
+	static const FName PurgeToAvoid { TEXT("PurgeToAvoid") };
 	static const FName ThreatSpeed { TEXT("ThreatSpeed") };
 	static const FName NearCount { TEXT("NearCount") };
 }
@@ -133,6 +135,22 @@ void UStudentPerceptorDanielAdamov::HandleSight(AActor* Actor, const FAIStimulus
 		
 		return;
 	}
+	
+	// If actor is a purge zone
+	if (Cast<APurgeZone>( Actor ))
+	{
+		FPerceivedActor* Record{ FindRecord( PurgeZones, Actor ) };
+		// If no record of zone-> populate the Record and push to TArray
+		if (!Record)
+		{
+			Record = &PurgeZones.AddDefaulted_GetRef();
+			Record->Actor = Actor;
+		}
+		
+		Record->bIsVisible = bSensed;
+		Record->LastKnownLocation = bSensed ? Actor->GetActorLocation() : Stimulus.StimulusLocation;
+		Record->LastSeenTime = TimeNow;
+	}
 }
 
 void UStudentPerceptorDanielAdamov::HandleDamage(AActor* Actor, const FAIStimulus& Stimulus)
@@ -160,16 +178,20 @@ void UStudentPerceptorDanielAdamov::RefreshWorldMemory()
 {
 	const float TimeNow{ static_cast<float>(GetWorld()->GetTimeSeconds()) };
 	
-	// 1. Remove stagnant memory (zombies are forgotten)
+	// 1. Remove stagnant memory (zombies are forgotten AFTER A DURATION)
 	Items.RemoveAll( [](const FPerceivedItem& R)
 	{
 		return !R.Actor.IsValid() || R.Actor->IsHidden();
 	});
-	Zombies.RemoveAll([&](const FPerceivedActor& R)
+	Zombies.RemoveAll([&](const FPerceivedActor& R) // zombies are forgotten AFTER A DURATION
 	{
 		return !R.Actor.IsValid() || (!R.bIsVisible && (TimeNow - R.LastSeenTime) > ThreatMemoryDuration);
 	});
 	Houses.RemoveAll([](const FPerceivedHouse& R)
+	{
+		return !R.Actor.IsValid();
+	});
+	PurgeZones.RemoveAll([](const FPerceivedActor& R)
 	{
 		return !R.Actor.IsValid();
 	});
@@ -379,6 +401,28 @@ void UStudentPerceptorDanielAdamov::WriteBlackboard()
 	}
 	BB->SetValueAsInt( SurvivorBBKeys::NearCount, NearCount );
 	
+	// -----------------------------------
+	// Set Purge Zone variables
+	// -----------------------------------
+	AActor* DangerPurge{ nullptr };
+	float BestDangerDistSqr{ TNumericLimits<float>::Max() };
+	for (const FPerceivedActor& P : PurgeZones)
+	{
+		if (!P.Actor.IsValid()) 
+			continue;
+		const APurgeZone* Purge{ Cast<APurgeZone>( P.Actor.Get() ) };
+		if (!Purge) 
+			continue;
+
+		const float DistSqr{ static_cast<float>( FVector::DistSquared2D( MyLocation, P.LastKnownLocation ) ) };
+		// Only a threat if we're inside the danger radius
+		if (DistSqr <= PurgeSafetyRadius * PurgeSafetyRadius && DistSqr < BestDangerDistSqr)
+		{
+			BestDangerDistSqr = DistSqr;
+			DangerPurge = P.Actor.Get();
+		}
+	}
+	WriteObjectIfChanged( BB, SurvivorBBKeys::PurgeToAvoid, DangerPurge );
 }
 
 UBlackboardComponent* UStudentPerceptorDanielAdamov::GetBlackboard() const

@@ -68,10 +68,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Perceptor")
 	float NearThreatRadius{ 1500.f };
 	
+	// Radius including the kill radius of a purge where survivor starts fleeing
+	UPROPERTY(EditAnywhere, Category = "Perceptor") 
+	float PurgeSafetyRadius{ 500.f };
+	
 private:
 	TArray<FPerceivedActor> Zombies;
 	TArray<FPerceivedItem> Items;
 	TArray<FPerceivedHouse> Houses;
+	TArray<FPerceivedActor> PurgeZones;
 	
 	FTimerHandle RefreshTimer;
 	
