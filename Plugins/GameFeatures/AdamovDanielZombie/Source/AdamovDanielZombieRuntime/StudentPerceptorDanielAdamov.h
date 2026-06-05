@@ -5,8 +5,6 @@
 #include "Items/ItemType.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
-#include "Perception/AISenseConfig_Damage.h"
-#include "Perception/AISense_Damage.h"
 #include "StudentPerceptorDanielAdamov.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE( FOnInventoryChanged );
@@ -70,7 +68,7 @@ protected:
 	
 	// Radius including the kill radius of a purge where survivor starts fleeing
 	UPROPERTY(EditAnywhere, Category = "Perceptor") 
-	float PurgeSafetyRadius{ 500.f };
+	float PurgeSafetyRadius{ 350.f };
 	
 private:
 	TArray<FPerceivedActor> Zombies;

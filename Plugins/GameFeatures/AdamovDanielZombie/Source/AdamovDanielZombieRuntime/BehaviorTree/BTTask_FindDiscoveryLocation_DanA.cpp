@@ -18,7 +18,7 @@ EBTNodeResult::Type UBTTask_FindDiscoveryLocation_DanA::ExecuteTask(UBehaviorTre
 	const APawn* Pawn{ Controller ? Controller->GetPawn() : nullptr };
 	if (!Pawn)
 		return EBTNodeResult::Failed;
-	UNavigationSystemV1* NavSys{ FNavigationSystem::GetCurrent<UNavigationSystemV1>( Pawn->GetWorld() ) };
+	const UNavigationSystemV1* NavSys{ FNavigationSystem::GetCurrent<UNavigationSystemV1>( Pawn->GetWorld() ) };
 	if (!NavSys)
 		return EBTNodeResult::Failed;
 	
