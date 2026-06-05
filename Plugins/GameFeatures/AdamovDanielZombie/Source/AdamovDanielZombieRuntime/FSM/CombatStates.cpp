@@ -67,7 +67,6 @@ FRepositionState::FRepositionState(const FCombatContext& InContext)
 
 void FRepositionState::OnEnter()
 {
-	LastDistance = TNumericLimits<float>::Max();
 	StuckTime = 0.f;
 }
 
@@ -78,34 +77,11 @@ void FRepositionState::OnUpdate(float DeltaTime)
 	if (!Pawn || !Threat) 
 		return;
 	
-	const FVector ThrLocation{ Threat->GetActorLocation() };
-	const FVector2D ThrLoc2D(ThrLocation.X, ThrLocation.Y);
-	
 	// ---------------------------------------------------------
 	// Stuck in Reposition Logic
-	const float DistanceNow{ static_cast<float>( FVector::Dist2D( Pawn->GetActorLocation(), ThrLocation ) ) };
-	
-	// 1. 
-	// if (LastDistance == TNumericLimits<float>::Max())
-	// {
-	// 	LastDistance = DistanceNow;
-	// }
-	// // 2. Check if gaining distance
-	// if (DistanceNow > LastDistance + Context.DistanceGainEpsilon)
-	// {
-	// 	StuckTime = 0.f;
-	// 	LastDistance = DistanceNow;
-	// }
-	// else
-	// {
-	// 	// Stuck in reposition
-	// 	StuckTime += DeltaTime;
-	// }
-	//
-	// Stuck in reposition
 	StuckTime += DeltaTime;
 	
-	// 3. If stuck -> set stuck flag which will abort Combat in the BT
+	// If stuck -> set stuck flag which will abort Combat in the BT
 	if (StuckTime >= Context.GiveUpTime)
 	{
 		if (UBlackboardComponent* BB = GetBlackboard())
@@ -115,6 +91,9 @@ void FRepositionState::OnUpdate(float DeltaTime)
 		return;
 	}
 	// --------------------------------------------------------
+	
+	const FVector ThrLocation{ Threat->GetActorLocation() };
+	const FVector2D ThrLoc2D(ThrLocation.X, ThrLocation.Y);
 	
 	// Flee and Face the Threat by APPLYING the Face behavior
 	const Steering::FSteeringState State{ Steering::MakeState( *Pawn ) };

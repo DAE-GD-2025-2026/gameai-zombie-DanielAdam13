@@ -111,12 +111,6 @@ void UBTTask_Combat_DanA::BuildFSM(AAIController& Controller, UBlackboardCompone
 			FVector::Dist2D( P->GetActorLocation(), Threat->GetActorLocation() ) : TNumericLimits<float>::Max();
 	}};
 	
-	constexpr float MySpeed{ 600.f }; // running speed
-	// I'd do P->GetRunningSpeed, but I can't =)
-	// if (const ASurvivorPawn* P = Cast<ASurvivorPawn>( Controller.GetPawn() ) )
-	// {
-	// }
-	
 	// Transitions live update with distance from Survivor Pawn to Threat
 	const float MinDist{ Ctx.MinDistance };
 	const float SafeDist{ Ctx.SafeDistance };
@@ -124,11 +118,19 @@ void UBTTask_Combat_DanA::BuildFSM(AAIController& Controller, UBlackboardCompone
 	// EXCEPTION: even if distance is low, when facing a Runner, don't transition to Reposition => stay Fight
 	// => If can't outrun even when fleeing -> fight
 	FSMInstance->AddTransition( Engage, Reposition, 
-		[DistanceToThreat, MinDist, BB, MySpeed]()
+		[DistanceToThreat, MinDist, BB]()
 		{
 			const bool bTooClose{ DistanceToThreat() < MinDist };
+			
 			const float ThreatSpeed{ BB ? BB->GetValueAsFloat( TEXT( "ThreatSpeed" )) : 0.f };
+			const float StaminaPct{ BB ? BB->GetValueAsFloat(TEXT("StaminaPct")) : 0.f };
+			// I'd do P->GetRunningSpeed, but I can't =)
+			// if (const ASurvivorPawn* P = Cast<ASurvivorPawn>( Controller.GetPawn() ) )
+			// {
+			// }
+			const float MySpeed{ StaminaPct > 0.f ? 600.f : 400.f };
 			const bool bCanOutrun{ ThreatSpeed > 0.f && ThreatSpeed < MySpeed };
+			
 			return bTooClose && bCanOutrun;
 		} );
 	FSMInstance->AddTransition( Reposition, Engage, 
