@@ -2,12 +2,8 @@
 
 #include "AIController.h"
 #include "AdamovDanielZombieRuntime/FSM/CombatStates.h"
-#include "AdamovDanielZombieRuntime/Steering/Steering.h"
 #include "../FSM/Transition.h"
-#include "../FSM/State.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "GameFramework/FloatingPawnMovement.h"
-#include "Survivor/SurvivorPawn.h"
 
 UBTTask_Combat_DanA::UBTTask_Combat_DanA()
 {
@@ -116,11 +112,10 @@ void UBTTask_Combat_DanA::BuildFSM(AAIController& Controller, UBlackboardCompone
 	}};
 	
 	constexpr float MySpeed{ 600.f }; // running speed
-	// I'd do P->GetRunningSpeed but I can't =))))))
+	// I'd do P->GetRunningSpeed, but I can't =)
 	// if (const ASurvivorPawn* P = Cast<ASurvivorPawn>( Controller.GetPawn() ) )
 	// {
 	// }
-	const float ThreatSpeed{ BB ? BB->GetValueAsFloat( TEXT( "ThreatSpeed" ) ) : 0.f };
 	
 	// Transitions live update with distance from Survivor Pawn to Threat
 	const float MinDist{ Ctx.MinDistance };
@@ -129,9 +124,10 @@ void UBTTask_Combat_DanA::BuildFSM(AAIController& Controller, UBlackboardCompone
 	// EXCEPTION: even if distance is low, when facing a Runner, don't transition to Reposition => stay Fight
 	// => If can't outrun even when fleeing -> fight
 	FSMInstance->AddTransition( Engage, Reposition, 
-		[DistanceToThreat, MinDist, ThreatSpeed, MySpeed]()
+		[DistanceToThreat, MinDist, BB, MySpeed]()
 		{
 			const bool bTooClose{ DistanceToThreat() < MinDist };
+			const float ThreatSpeed{ BB ? BB->GetValueAsFloat( TEXT( "ThreatSpeed" )) : 0.f };
 			const bool bCanOutrun{ ThreatSpeed > 0.f && ThreatSpeed < MySpeed };
 			return bTooClose && bCanOutrun;
 		} );
