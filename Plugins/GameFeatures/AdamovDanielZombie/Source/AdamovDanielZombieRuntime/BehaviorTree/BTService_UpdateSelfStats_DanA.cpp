@@ -17,6 +17,10 @@ UBTService_UpdateSelfStats_DanA::UBTService_UpdateSelfStats_DanA()
 		this, GET_MEMBER_NAME_CHECKED( UBTService_UpdateSelfStats_DanA, StaminaPctKey ) );
 	HasFreeSlotKey.AddBoolFilter( 
 		this, GET_MEMBER_NAME_CHECKED( UBTService_UpdateSelfStats_DanA, HasFreeSlotKey ) );
+	HasFoodKey.AddBoolFilter( 
+		this, GET_MEMBER_NAME_CHECKED( UBTService_UpdateSelfStats_DanA, HasFoodKey ) );
+	HasMedkitKey.AddBoolFilter( 
+		this, GET_MEMBER_NAME_CHECKED( UBTService_UpdateSelfStats_DanA, HasMedkitKey ) );
 }
 
 void UBTService_UpdateSelfStats_DanA::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
@@ -44,18 +48,28 @@ void UBTService_UpdateSelfStats_DanA::TickNode(UBehaviorTreeComponent& OwnerComp
 		BB->SetValueAsFloat( StaminaPctKey.SelectedKeyName, Stamina->GetCurrentStamina() / MaxSt );
 	}
 	
-	// Inventory free slot boolean set
+	// Inventory booleans checks - Has Free Slot / Has Food / Has Medkit
 	if (const UInventoryComponent* Inv = Pawn->FindComponentByClass<UInventoryComponent>())
 	{
 		bool bHasFree{ false };
+		bool bHasFood{ false };
+		bool bHasMedkit{ false };
 		for (const ABaseItem* Item : Inv->GetInventory())
 		{
-			if (Item == nullptr)
+			if (!Item)
 			{
 				bHasFree = true; 
-				break;
+				continue;
 			}
+			if (Item->GetValue() <= 0) // Used resources don't count
+				continue;
+			if (Item->GetItemType() == EItemType::Food)
+				bHasFood = true;
+			if (Item->GetItemType() == EItemType::Medkit)
+				bHasMedkit = true;
 		}
 		BB->SetValueAsBool(HasFreeSlotKey.SelectedKeyName, bHasFree);
+		BB->SetValueAsBool(HasFoodKey.SelectedKeyName, bHasFood);
+		BB->SetValueAsBool(HasMedkitKey.SelectedKeyName, bHasMedkit);
 	}
 }

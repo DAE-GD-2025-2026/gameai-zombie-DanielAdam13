@@ -21,7 +21,12 @@ protected:
 	FBlackboardKeySelector HealthPctKey;
 	UPROPERTY(EditAnywhere, Category="Stats")
 	FBlackboardKeySelector StaminaPctKey;
+	
 	UPROPERTY(EditAnywhere, Category="Stats")
 	FBlackboardKeySelector HasFreeSlotKey;
+	UPROPERTY(EditAnywhere, Category="Stats")
+	FBlackboardKeySelector HasFoodKey;
+	UPROPERTY(EditAnywhere, Category="Stats")
+	FBlackboardKeySelector HasMedkitKey;
 	
 };
