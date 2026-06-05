@@ -3,6 +3,7 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Common/HealthComponent.h"
+#include "Common/InventoryComponent.h"
 #include "Common/StaminaComponent.h"
 
 UBTService_UpdateSelfStats_DanA::UBTService_UpdateSelfStats_DanA()
@@ -10,8 +11,12 @@ UBTService_UpdateSelfStats_DanA::UBTService_UpdateSelfStats_DanA()
 	NodeName = TEXT("Update Self Stats");
 	Interval = 0.2f;
 	RandomDeviation = 0.05f;
-	HealthPctKey.AddFloatFilter( this, GET_MEMBER_NAME_CHECKED( UBTService_UpdateSelfStats_DanA, HealthPctKey ) );
-	StaminaPctKey.AddFloatFilter( this, GET_MEMBER_NAME_CHECKED( UBTService_UpdateSelfStats_DanA, StaminaPctKey ) );
+	HealthPctKey.AddFloatFilter( 
+		this, GET_MEMBER_NAME_CHECKED( UBTService_UpdateSelfStats_DanA, HealthPctKey ) );
+	StaminaPctKey.AddFloatFilter( 
+		this, GET_MEMBER_NAME_CHECKED( UBTService_UpdateSelfStats_DanA, StaminaPctKey ) );
+	HasFreeSlotKey.AddBoolFilter( 
+		this, GET_MEMBER_NAME_CHECKED( UBTService_UpdateSelfStats_DanA, HasFreeSlotKey ) );
 }
 
 void UBTService_UpdateSelfStats_DanA::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
@@ -33,9 +38,24 @@ void UBTService_UpdateSelfStats_DanA::TickNode(UBehaviorTreeComponent& OwnerComp
 	}
 	
 	// Stamina Comp from GameAI_Zombie
-	if (const UStaminaComponent* Health = Pawn->FindComponentByClass<UStaminaComponent>())
+	if (const UStaminaComponent* Stamina = Pawn->FindComponentByClass<UStaminaComponent>())
 	{
-		const float MaxSt{ static_cast<float>(FMath::Max( 1, Health->GetMaxStamina() )) };
-		BB->SetValueAsFloat( HealthPctKey.SelectedKeyName, Health->GetCurrentStamina() / MaxSt );
+		const float MaxSt{ FMath::Max( 1, Stamina->GetMaxStamina() ) };
+		BB->SetValueAsFloat( StaminaPctKey.SelectedKeyName, Stamina->GetCurrentStamina() / MaxSt );
+	}
+	
+	// Inventory free slot boolean set
+	if (const UInventoryComponent* Inv = Pawn->FindComponentByClass<UInventoryComponent>())
+	{
+		bool bHasFree{ false };
+		for (const ABaseItem* Item : Inv->GetInventory())
+		{
+			if (Item == nullptr)
+			{
+				bHasFree = true; 
+				break;
+			}
+		}
+		BB->SetValueAsBool(HasFreeSlotKey.SelectedKeyName, bHasFree);
 	}
 }

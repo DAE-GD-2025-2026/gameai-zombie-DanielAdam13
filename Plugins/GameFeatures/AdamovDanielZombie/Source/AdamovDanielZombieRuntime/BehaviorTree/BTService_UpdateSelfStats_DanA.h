@@ -21,6 +21,7 @@ protected:
 	FBlackboardKeySelector HealthPctKey;
 	UPROPERTY(EditAnywhere, Category="Stats")
 	FBlackboardKeySelector StaminaPctKey;
-	
+	UPROPERTY(EditAnywhere, Category="Stats")
+	FBlackboardKeySelector HasFreeSlotKey;
 	
 };
