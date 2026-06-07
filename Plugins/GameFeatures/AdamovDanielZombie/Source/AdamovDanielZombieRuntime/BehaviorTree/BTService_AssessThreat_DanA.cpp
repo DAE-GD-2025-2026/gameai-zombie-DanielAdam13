@@ -64,11 +64,6 @@ void UBTService_AssessThreat_DanA::TickNode(UBehaviorTreeComponent& OwnerComp, u
 	{
 		bFlee = true;
 	}
-	// 4. Heavy zombie nearby, not worth fighting
-	else if (ThreatSpeed > 0.f && ThreatSpeed < HeavySpeedThreshold)
-	{
-		bFlee = true;
-	}
 	
 	// !! Else we fight - enter Combat task !!
 	
