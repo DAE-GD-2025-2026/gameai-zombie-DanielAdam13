@@ -64,7 +64,7 @@ Combat States are assigned Transitions which constantly check the distance betwe
 
 Memory
 
-![Memory removal code](looting_memory_code.jpg)
+![Memory removal code](readmeAssets/looting_memory_code.png)
 
 Priority
 
@@ -76,11 +76,11 @@ Priority
 
 - Eat Food when Stamina ≤ 0.3
 - Use Medkit when Health ≤ 0.3
-![Use item behavior tree](use_item_behavior_tree.jpg)
+![Use item behavior tree](readmeAssets/use_item_behavior_tree.png)
  
 Drop used Items
  
-![Drop used items code](drop_items_code.jpg)
+![Drop used items code](readmeAssets/drop_items_code.png)
 
 ![Inventory gameplay screenshot](inventory_gameplay.jpg)
  
