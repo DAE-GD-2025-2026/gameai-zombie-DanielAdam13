@@ -1,12 +1,12 @@
 # Algorithms 2 Project: Zombie AI
 
-# The final result:
+## The final result:
 
-<table> <tr> <td><img src="./readmeAssets/fleeing.gif" width="400"/></td> <td><img src="./readmeAssets/combat.gif" width="400"/></td> </tr> </table> <p align="center"> <img src="./readmeAssets/exploration.gif" width="400"/> </p>
+<table> <tr> <td align="center"><img src="./readmeAssets/fleeing.gif" width="400"/><br/>Fleeing</td> <td align="center"><img src="./readmeAssets/combat.gif" width="400"/><br/>Combat</td> </tr> </table> <p align="center"> <img src="./readmeAssets/exploration.gif" width="400"/><br/>Exploration </p>
 
 ---
 
-# Explaination:
+# Explaination
 
 ## Decision Making
  
