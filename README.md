@@ -1,6 +1,12 @@
 # Algorithms 2 Project: Zombie AI
 
+# The final result:
+
+<table> <tr> <td><img src="./readmeAssets/fleeing.gif" width="400"/></td> <td><img src="./readmeAssets/combat.gif" width="400"/></td> </tr> </table> <p align="center"> <img src="./readmeAssets/exploration.gif" width="400"/> </p>
+
 ---
+
+# Explaination:
 
 ## Decision Making
  
@@ -36,7 +42,6 @@ Uses NavMesh MoveTo
 1. No weapon / no ammo on weapon
 2. Health too low
 3. Too many Threats nearby
-![Fleeing gameplay screenshot](fleeing_gameplay.jpg)
 
 ### Combat
 
@@ -45,8 +50,6 @@ Uses Face and Flee Steering Behaviors
 *FSM is the perfect fit for Face and Fire / Back off when cornered / Re-aim when zombie moves*
 
 ![Combat transition code](readmeAssets/combat_code.png)
-
-![Combat gameplay screenshot](combat_gameplay.jpg)
 
 FSM is Built and Started in the Combat Task Enter.
 FSM is Ticked in Combat Task Tick.
@@ -76,13 +79,12 @@ Priority
 
 - Eat Food when Stamina ≤ 0.3
 - Use Medkit when Health ≤ 0.3
+
 ![Use item behavior tree](readmeAssets/use_item_behavior_tree.png)
  
 Drop used Items
  
 ![Drop used items code](readmeAssets/drop_items_code.png)
-
-![Inventory gameplay screenshot](inventory_gameplay.jpg)
  
 ---
 
@@ -98,7 +100,6 @@ Drop used Items
    - Furthest point from TargetThreat(Zombie) Actor
 4. **Fleeing from Purge Zone**
    - Reuses same logic - runs away from PurgeToAvoid Actor
-![Purge zone gameplay screenshot](steering_purge_gameplay.jpg)
 
 ![Flee settings panel](readmeAssets/steering_flee_settings.png)
 
@@ -124,6 +125,3 @@ Drop used Items
 ### Discovering (Lowest Priority)
 
 ![Explore settings panel](readmeAssets/exploration_explore_settings.png)
-
-![Discovery gameplay screenshot](exploration_gameplay.jpg)
-
